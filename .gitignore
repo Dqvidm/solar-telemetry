@@ -1,18 +1,32 @@
-# ========================================
-# Sensitive Credentials & Local Configs
-# ========================================
+# ====================================================================
+# 1. SECURITY & SENSITIVE CREDENTIALS (ZERO TOLERANCE)
+# ====================================================================
 src/main/resources/application.properties
 src/main/resources/application.yml
-src/main/resources/application-local.properties
-src/main/resources/application-local.yml
+src/main/resources/application-*.properties
+src/main/resources/application-*.yml
 *.env
 .env
 .env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 secrets/
+*.pem
+*.key
+*.pkcs12
+*.pfx
+*.p12
+*.jks
+*.keystore
+id_rsa*
+id_ed25519*
+*.credentials
 
-# ========================================
-# Compiled Java & Maven Build Outputs
-# ========================================
+# ====================================================================
+# 2. JAVA, SPRING BOOT & MAVEN ARTIFACTS
+# ====================================================================
 target/
 *.class
 *.jar
@@ -22,53 +36,37 @@ target/
 *.zip
 *.tar.gz
 *.rar
+*.hprof
 hs_err_pid*
 replay_pid*
-
-# Maven wrapper jar if not tracking binary
 .mvn/wrapper/maven-wrapper.jar
 
-# ========================================
-# IntelliJ IDEA Metadata & Workspaces
-# ========================================
-.idea/
-*.iml
-*.iws
-*.ipr
-out/
-.idea_modules/
-cmake-build-*/
-
-# ========================================
-# Eclipse & NetBeans
-# ========================================
-.classpath
-.project
-.settings/
-.springBeans
-.sts4-cache/
-.factorypath
-nbproject/private/
-build/
-nbbuild/
-dist/
-
-# ========================================
-# VS Code & PlatformIO (if added)
-# ========================================
-.vscode/
-.pio/
-.pioenvs/
-.piolibdeps/
-
-# ========================================
-# Python Bytecode & Virtual Environments
-# ========================================
+# ====================================================================
+# 3. PYTHON CACHES & VIRTUAL ENVIRONMENTS
+# ====================================================================
 __pycache__/
 *.py[cod]
 *$py.class
 *.so
 .Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
 env/
 venv/
 .venv/
@@ -80,14 +78,79 @@ pip-delete-this-directory.txt
 .pytest_cache/
 .coverage
 htmlcov/
+.tox/
+.nox/
+.hypothesis/
 
-# ========================================
-# OS & System Junk Files
-# ========================================
+# ====================================================================
+# 4. EMBEDDED / C / C++ (ARDUINO, ESP32, PLATFORMIO)
+# ====================================================================
+*.o
+*.obj
+*.elf
+*.bin
+*.hex
+*.d
+.pio/
+.pioenvs/
+.piolibdeps/
+cmake-build-*/
+
+# ====================================================================
+# 5. IDEs & WORKSPACES
+# ====================================================================
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+.idea_modules/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Eclipse & NetBeans
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+.factorypath
+nbproject/private/
+nbbuild/
+
+# ====================================================================
+# 6. LOGS & RUNTIME DUMPS
+# ====================================================================
+*.log
+logs/
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ====================================================================
+# 7. OPERATING SYSTEM ARTIFACTS
+# ====================================================================
+# macOS
 .DS_Store
 .DS_Store?
 ._*
 .Spotlight-V100
 .Trashes
-ehthumbs.db
+
+# Windows
 Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
