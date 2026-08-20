@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photovoltaic Telemetry Platform</title>
+    <style>
+        :root {
+            --bg-base: #060b13;
+            --card-bg: rgba(10, 20, 35, 0.85);
+            --card-border: rgba(0, 180, 255, 0.25);
+            --neon-blue: #00d2ff;
+            --neon-amber: #ff9d00;
+            --neon-cyan: #00f2fe;
+            --neon-green: #00ff88;
+            --neon-purple: #c084fc;
+            --text-main: #f0f6fc;
+            --text-muted: #8b9bb4;
+            --grid-line: rgba(0, 210, 255, 0.04);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image:
+                    linear-gradient(var(--grid-line) 1px, transparent 1px),
+                    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px),
+                    radial-gradient(circle at 80% 20%, rgba(0, 210, 255, 0.08) 0%, transparent 50%),
+                    radial-gradient(circle at 20% 80%, rgba(255, 157, 0, 0.05) 0%, transparent 40%);
+            background-size: 32px 32px, 32px 32px, 100% 100%, 100% 100%;
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 2rem 2.5rem;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 1.25rem;
+        }
+
+        .brand-icon {
+            display: grid;
+            grid-template-columns: repeat(2, 12px);
+            grid-gap: 4px;
+        }
+
+        .brand-block {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .brand-block.white { background-color: #fff; }
+        .brand-block.blue { background-color: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
+        .brand-block.dark { background-color: #1a2a40; }
+
+        .brand-text h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            background: linear-gradient(90deg, #fff, var(--neon-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .weather-badge {
+            background: rgba(0, 210, 255, 0.08);
+            border: 1px solid var(--card-border);
+            padding: 0.5rem 1.2rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.85rem;
+            color: var(--neon-cyan);
+            backdrop-filter: blur(8px);
+        }
+
+        .dashboard-layout {
+            display: grid;
+            grid-template-columns: 340px 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(12px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--neon-blue), transparent);
+        }
+
+        .panel h2 {
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--neon-blue);
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+        }
+
+        input {
+            width: 100%;
+            background: rgba(4, 10, 20, 0.8);
+            border: 1px solid rgba(0, 180, 255, 0.2);
+            color: var(--neon-cyan);
+            padding: 0.65rem 0.85rem;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 8px rgba(0, 210, 255, 0.3);
+        }
+
+        button.btn-primary {
+            width: 100%;
+            background: linear-gradient(135deg, #0088cc, #005588);
+            color: #fff;
+            border: 1px solid var(--neon-blue);
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        button.btn-primary:hover {
+            background: linear-gradient(135deg, var(--neon-blue), #0077b5);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.5);
+        }
+
+        /* 3D Isometric Viewport */
+        .viewport-wrapper {
+            perspective: 1200px;
+            margin-bottom: 2rem;
+        }
+
+        .interactive-viewport {
+            background: radial-gradient(circle at 50% 20%, rgba(0, 210, 255, 0.12) 0%, rgba(6, 11, 19, 0.95) 75%), #060b13;
+            border: 1px solid rgba(0, 210, 255, 0.35);
+            border-radius: 12px;
+            height: 280px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: crosshair;
+            overflow: hidden;
+            transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1);
+            transform-style: preserve-3d;
+            box-shadow: inset 0 0 35px rgba(0, 0, 0, 0.8), 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .viewport-hint {
+            position: absolute;
+            bottom: 10px;
+            right: 14px;
+            font-size: 0.72rem;
+            color: var(--neon-cyan);
+            letter-spacing: 0.8px;
+            text-transform: uppercase;
+            pointer-events: none;
+            opacity: 0.75;
+        }
+
+        /* Silicon Panel 3D Geometry Shading */
+        .panel-top {
+            fill: url(#panelGradient);
+            stroke: #00f2fe;
+            stroke-width: 1.2;
+            transition: fill 0.3s, filter 0.3s;
+        }
+
+        .panel-side-dark {
+            fill: #031326;
+            stroke: rgba(0, 210, 255, 0.4);
+            stroke-width: 1;
+        }
+
+        .panel-side-light {
+            fill: #08294d;
+            stroke: rgba(0, 210, 255, 0.4);
+            stroke-width: 1;
+        }
+
+        .panel-grid-line {
+            stroke: rgba(0, 242, 254, 0.35);
+            stroke-width: 0.8;
+        }
+
+        .energy-conduit {
+            stroke: var(--neon-cyan);
+            stroke-width: 2;
+            stroke-dasharray: 6 8;
+            animation: flowPulse 1.2s linear infinite;
+            filter: drop-shadow(0 0 6px var(--neon-cyan));
+        }
+
+        @keyframes flowPulse {
+            from { stroke-dashoffset: 28; }
+            to { stroke-dashoffset: 0; }
+        }
+
+        .sun-glow {
+            fill: url(#sunRadial);
+            filter: drop-shadow(0 0 20px #ff9d00);
+        }
+
+        .moon-glow {
+            fill: url(#moonRadial);
+            filter: drop-shadow(0 0 15px rgba(200, 225, 255, 0.85));
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.85rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(6, 15, 30, 0.7);
+            border: 1px solid rgba(0, 180, 255, 0.15);
+            border-radius: 6px;
+            padding: 0.9rem;
+            position: relative;
+        }
+
+        .metric-card.accent-amber { border-color: rgba(255, 157, 0, 0.3); }
+        .metric-card.accent-green { border-color: rgba(0, 255, 136, 0.3); }
+        .metric-card.accent-purple { border-color: rgba(192, 132, 252, 0.3); }
+
+        .metric-card .title {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+        }
+
+        .metric-card .value {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--neon-blue);
+            margin-top: 0.3rem;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-card.accent-amber .value {
+            color: var(--neon-amber);
+            text-shadow: 0 0 10px rgba(255, 157, 0, 0.4);
+        }
+
+        .metric-card.accent-green .value {
+            color: var(--neon-green);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.4);
+        }
+
+        .metric-card.accent-purple .value {
+            color: var(--neon-purple);
+            text-shadow: 0 0 10px rgba(192, 132, 252, 0.4);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem 1rem;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(0, 180, 255, 0.2);
+        }
+
+        td {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: #d1dbe5;
+        }
+
+        tr:hover td {
+            background: rgba(0, 210, 255, 0.04);
+        }
+
+        .btn-delete {
+            background: transparent;
+            border: 1px solid rgba(255, 80, 80, 0.4);
+            color: #ff6666;
+            padding: 0.25rem 0.6rem;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: rgba(255, 80, 80, 0.2);
+            box-shadow: 0 0 8px rgba(255, 80, 80, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="brand-container">
+        <div class="brand-icon">
+            <div class="brand-block white"></div>
+            <div class="brand-block dark"></div>
+            <div class="brand-block blue"></div>
+            <div class="brand-block white"></div>
+        </div>
+        <div class="brand-text">
+            <h1>SOLAR NEXUS</h1>
+            <p>Photovoltaic Telemetry Platform</p>
+        </div>
+    </div>
+
+    <div class="weather-badge">
+        <span id="weatherIcon">🌙</span>
+        <span>Outdoor Ambient: <strong id="outdoorTemp">--°C</strong></span>
+        <span style="opacity: 0.5">|</span>
+        <span id="weatherCondition">Syncing...</span>
+    </div>
+</header>
+
+<div class="dashboard-layout">
+    <div class="panel">
+        <h2>Manual Ingestion</h2>
+        <form id="telemetryForm" onsubmit="return transmitTelemetry(event)">
+            <div class="form-group">
+                <label for="voltage">Array Voltage (V)</label>
+                <input type="number" step="0.1" id="voltage" required placeholder="e.g. 48.5">
+            </div>
+            <div class="form-group">
+                <label for="current">String Current (A)</label>
+                <input type="number" step="0.1" id="current" required placeholder="e.g. 8.2">
+            </div>
+            <div class="form-group">
+                <label for="temperature">Cell Temperature (°C)</label>
+                <input type="number" step="0.1" id="temperature" required placeholder="e.g. 32.4">
+            </div>
+            <button type="submit" class="btn-primary">Transmit Packet</button>
+        </form>
+    </div>
+
+    <div>
+        <div class="viewport-wrapper">
+            <div class="interactive-viewport" id="interactiveCanvas">
+                <svg id="svgViewport" width="600" height="250" viewBox="0 0 600 250" fill="none">
+                    <defs>
+                        <linearGradient id="panelGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#0a325c" />
+                            <stop offset="60%" stop-color="#061b33" />
+                            <stop offset="100%" stop-color="#020d1a" />
+                        </linearGradient>
+
+                        <linearGradient id="standGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#00d2ff" />
+                            <stop offset="100%" stop-color="#031f3b" />
+                        </linearGradient>
+
+                        <radialGradient id="sunRadial" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#ffffff" />
+                            <stop offset="40%" stop-color="#ffb700" />
+                            <stop offset="100%" stop-color="#ff6a00" />
+                        </radialGradient>
+
+                        <radialGradient id="moonRadial" cx="40%" cy="40%" r="50%">
+                            <stop offset="0%" stop-color="#ffffff" />
+                            <stop offset="60%" stop-color="#cbd5e1" />
+                            <stop offset="100%" stop-color="#64748b" />
+                        </radialGradient>
+                    </defs>
+
+                    <g id="starField" opacity="0.6">
+                        <circle cx="80" cy="40" r="1" fill="#fff" />
+                        <circle cx="160" cy="25" r="1.5" fill="#fff" />
+                        <circle cx="280" cy="50" r="1" fill="#fff" />
+                        <circle cx="490" cy="30" r="1.2" fill="#fff" />
+                        <circle cx="530" cy="80" r="1" fill="#fff" />
+                    </g>
+
+                    <g opacity="0.35">
+                        <polygon points="300,180 500,220 300,260 100,220" fill="rgba(0,210,255,0.02)" stroke="rgba(0,210,255,0.3)" stroke-width="1.2"/>
+                        <line x1="200" y1="200" x2="400" y2="240" stroke="rgba(0,210,255,0.2)" stroke-width="1"/>
+                        <line x1="400" y1="200" x2="200" y2="240" stroke="rgba(0,210,255,0.2)" stroke-width="1"/>
+                    </g>
+
+                    <g id="celestialGroup" transform="translate(480, 50)">
+                        <circle id="celestialBody" class="moon-glow" cx="0" cy="0" r="18" />
+                        <path id="moonCrescent" d="M 0 -18 A 18 18 0 0 0 0 18 A 13 13 0 0 1 0 -18 Z" fill="#060b13" style="display: block;" />
+                    </g>
+
+                    <line id="celestialBeam" x1="480" y1="50" x2="295" y2="135" stroke="rgba(200,225,255,0.18)" stroke-width="1.8" stroke-dasharray="4 6" />
+
+                    <g id="pvArrayGroup" transform="translate(160, 60)">
+                        <path d="M 90 135 L 90 180" stroke="url(#standGradient)" stroke-width="4.5" stroke-linecap="round" />
+                        <path d="M 220 135 L 220 180" stroke="url(#standGradient)" stroke-width="4.5" stroke-linecap="round" />
+                        <line x1="90" y1="180" x2="220" y2="180" stroke="#00d2ff" stroke-width="2" />
+
+                        <path d="M 90 180 L 155 195 L 220 180 L 290 205" fill="none" class="energy-conduit" />
+
+                        <g id="pvModuleLeft" transform="translate(0, 10)">
+                            <polygon points="10,65 90,110 90,118 10,73" class="panel-side-dark" />
+                            <polygon points="90,110 170,70 170,78 90,118" class="panel-side-light" />
+                            <polygon points="90,20 170,70 90,110 10,65" class="panel-top" />
+                            <line x1="50" y1="42.5" x2="130" y2="90" class="panel-grid-line" />
+                            <line x1="50" y1="87.5" x2="130" y2="45" class="panel-grid-line" />
+                        </g>
+
+                        <g id="pvModuleRight" transform="translate(130, 10)">
+                            <polygon points="10,65 90,110 90,118 10,73" class="panel-side-dark" />
+                            <polygon points="90,110 170,70 170,78 90,118" class="panel-side-light" />
+                            <polygon points="90,20 170,70 90,110 10,65" class="panel-top" />
+                            <line x1="50" y1="42.5" x2="130" y2="90" class="panel-grid-line" />
+                            <line x1="50" y1="87.5" x2="130" y2="45" class="panel-grid-line" />
+                        </g>
+                    </g>
+                </svg>
+                <div class="viewport-hint">Move mouse to calibrate array orientation</div>
+            </div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="title">Array Voltage</div>
+                <div class="value" id="cardVoltage">-- V</div>
+            </div>
+            <div class="metric-card">
+                <div class="title">String Current</div>
+                <div class="value" id="cardCurrent">-- A</div>
+            </div>
+            <div class="metric-card accent-amber">
+                <div class="title">Output Power</div>
+                <div class="value" id="cardPower">-- W</div>
+            </div>
+            <div class="metric-card accent-green">
+                <div class="title">Live Cell Temp</div>
+                <div class="value" id="cardTemp">-- °C</div>
+            </div>
+            <div class="metric-card accent-purple">
+                <div class="title">Expected Temp</div>
+                <div class="value" id="cardExpectedTemp">-- °C</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Real-Time Telemetry Stream</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Packet ID</th>
+                    <th>Voltage (V)</th>
+                    <th>Current (A)</th>
+                    <th>Cell Temp (°C)</th>
+                    <th>Computed Power</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="telemetryTableBody">
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = '/api/telemetry';
+    let currentAmbientTemp = 20.0;
+    let isDayTime = 0;
+    let currentSolarIrradiance = 0;
+
+    // 1. Fetch Outdoor Weather & Day/Night Cycle via Open-Meteo API
+    async function fetchOutdoorWeather() {
+        const lat = 44.4323;
+        const lon = 26.1063;
+        const currentHour = new Date().getHours();
+        const isLocalDaytime = (currentHour >= 6 && currentHour < 20);
+
+        try {
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,is_day,direct_radiation,weather_code&timezone=auto`);
+
+            if (res.ok) {
+                const data = await res.json();
+                currentAmbientTemp = Number(data.current.temperature_2m);
+                isDayTime = Number(data.current.is_day) === 1 ? 1 : 0;
+                currentSolarIrradiance = Number(data.current.direct_radiation) || (isDayTime ? 650 : 0);
+                const code = data.current.weather_code;
+
+                document.getElementById('outdoorTemp').innerText = `${currentAmbientTemp.toFixed(1)}°C`;
+                document.getElementById('weatherCondition').innerText = mapWeatherCode(code);
+
+                updateCelestialVisuals(isDayTime);
+                calculateExpectedCellTemperature();
+                return;
+            }
+        } catch (e) {
+            console.warn("Weather API fallback active:", e);
+        }
+
+        // Local fallback logic
+        isDayTime = isLocalDaytime ? 1 : 0;
+        currentAmbientTemp = isDayTime ? 24.0 : 16.0;
+        currentSolarIrradiance = isDayTime ? 600 : 0;
+
+        document.getElementById('outdoorTemp').innerText = `${currentAmbientTemp.toFixed(1)}°C`;
+        document.getElementById('weatherCondition').innerText = isDayTime ? "Clear Sky" : "Clear Night";
+
+        updateCelestialVisuals(isDayTime);
+        calculateExpectedCellTemperature();
+    }
+
+    function updateCelestialVisuals(isDay) {
+        const iconElem = document.getElementById('weatherIcon');
+        const body = document.getElementById('celestialBody');
+        const moonMask = document.getElementById('moonCrescent');
+        const beam = document.getElementById('celestialBeam');
+
+        if (isDay === 1) {
+            iconElem.textContent = '☀️';
+            if (body) body.setAttribute('class', 'sun-glow');
+            if (moonMask) moonMask.style.display = 'none';
+            if (beam) beam.setAttribute('stroke', 'rgba(255,183,0,0.35)');
+        } else {
+            iconElem.textContent = '🌙';
+            if (body) body.setAttribute('class', 'moon-glow');
+            if (moonMask) moonMask.style.display = 'block';
+            if (beam) beam.setAttribute('stroke', 'rgba(200,225,255,0.18)');
+        }
+    }
+
+    // NOCT Model: T_cell = T_ambient + ((NOCT - 20) / 800) * G
+    function calculateExpectedCellTemperature() {
+        const NOCT = 45.0;
+        const expected = currentAmbientTemp + ((NOCT - 20.0) / 800.0) * currentSolarIrradiance;
+        document.getElementById('cardExpectedTemp').innerText = `${expected.toFixed(1)} °C`;
+    }
+
+    function mapWeatherCode(code) {
+        if (code === 0) return "Clear Sky";
+        if (code <= 3) return "Partly Cloudy";
+        if (code <= 48) return "Foggy";
+        if (code <= 67) return "Rain Showers";
+        return "Overcast";
+    }
+
+    // 2. Interactive 3D Cursor Ray-Tracking
+    const viewport = document.getElementById('interactiveCanvas');
+    const celestialGroup = document.getElementById('celestialGroup');
+    const celestialBeam = document.getElementById('celestialBeam');
+    const pvGroup = document.getElementById('pvArrayGroup');
+
+    viewport.addEventListener('mousemove', (e) => {
+        const rect = viewport.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const rotateX = ((y / rect.height) - 0.5) * -22;
+        const rotateY = ((x / rect.width) - 0.5) * 28;
+        viewport.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+
+        const tiltOffset = ((x / rect.width) - 0.5) * 12;
+        pvGroup.style.transform = `translate(160px, 60px) skewY(${tiltOffset}deg)`;
+
+        const boundedY = Math.min(Math.max(y, 25), 85);
+        celestialGroup.setAttribute('transform', `translate(${x}, ${boundedY})`);
+        celestialBeam.setAttribute('x1', x);
+        celestialBeam.setAttribute('y1', boundedY);
+    });
+
+    viewport.addEventListener('mouseleave', () => {
+        viewport.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        pvGroup.style.transform = 'translate(160px, 60px) skewY(0deg)';
+        celestialGroup.setAttribute('transform', 'translate(480, 50)');
+        celestialBeam.setAttribute('x1', 480);
+        celestialBeam.setAttribute('y1', 50);
+    });
+
+    // 3. Telemetry Ingestion Loop
+    async function fetchTelemetryData() {
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) return;
+            const data = await response.json();
+            if (Array.isArray(data)) {
+                renderTable(data);
+                updateCards(data);
+            }
+        } catch (err) {
+            console.error("Telemetry fetch error:", err);
+        }
+    }
+
+    function renderTable(data) {
+        const tbody = document.getElementById('telemetryTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        const reversed = [...data].reverse();
+
+        reversed.forEach(item => {
+            const v = item && item.voltage != null ? Number(item.voltage) : 0.0;
+            const c = item && item.current != null ? Number(item.current) : 0.0;
+            const t = item && item.temperature != null ? Number(item.temperature) : 0.0;
+            const power = (v * c).toFixed(1);
+
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                    <td>#${item.id || '--'}</td>
+                    <td>${v.toFixed(1)}</td>
+                    <td>${c.toFixed(1)}</td>
+                    <td>${t.toFixed(1)}</td>
+                    <td style="color: var(--neon-amber); font-weight: 600;">${power} W</td>
+                    <td>
+                        <button type="button" class="btn-delete" onclick="deleteTelemetry(${item.id})">Purge</button>
+                    </td>
+                `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function updateCards(data) {
+        if (!data || data.length === 0) {
+            document.getElementById('cardVoltage').innerText = '-- V';
+            document.getElementById('cardCurrent').innerText = '-- A';
+            document.getElementById('cardPower').innerText = '-- W';
+            document.getElementById('cardTemp').innerText = '-- °C';
+            return;
+        }
+        const latest = data[data.length - 1];
+        const v = latest && latest.voltage != null ? Number(latest.voltage) : 0.0;
+        const c = latest && latest.current != null ? Number(latest.current) : 0.0;
+        const t = latest && latest.temperature != null ? Number(latest.temperature) : 0.0;
+        const power = (v * c).toFixed(1);
+
+        document.getElementById('cardVoltage').innerText = `${v.toFixed(1)} V`;
+        document.getElementById('cardCurrent').innerText = `${c.toFixed(1)} A`;
+        document.getElementById('cardPower').innerText = `${power} W`;
+        document.getElementById('cardTemp').innerText = `${t.toFixed(1)} °C`;
+    }
+
+    async function transmitTelemetry(event) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+
+        const vElem = document.getElementById('voltage');
+        const cElem = document.getElementById('current');
+        const tElem = document.getElementById('temperature');
+
+        if (!vElem || !cElem || !tElem) return false;
+
+        const payload = {
+            voltage: parseFloat(vElem.value) || 0.0,
+            current: parseFloat(cElem.value) || 0.0,
+            temperature: parseFloat(tElem.value) || 0.0
+        };
+
+        try {
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (response.ok) {
+                vElem.value = '';
+                cElem.value = '';
+                tElem.value = '';
+                await fetchTelemetryData();
+            }
+        } catch (err) {
+            console.error("POST failed:", err);
+        }
+
+        return false;
+    }
+
+    async function deleteTelemetry(id) {
+        if (!id) return;
+        try {
+            const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+            if (response.ok) {
+                await fetchTelemetryData();
+            }
+        } catch (err) {
+            console.error("DELETE failed:", err);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        fetchOutdoorWeather();
+        fetchTelemetryData();
+        setInterval(fetchTelemetryData, 2000);   // Poll PV telemetry stream every 2s
+        setInterval(fetchOutdoorWeather, 300000); // Poll outdoor weather every 5m
+    });
+</script>
+</body>
+</html>

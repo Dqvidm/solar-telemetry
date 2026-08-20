@@ -1,0 +1,21 @@
+# Compiled Class files & Build outputs
+target/
+*.class
+
+# IntelliJ IDEA metadata
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# Python cache & virtual environments
+__pycache__/
+*.pyc
+venv/
+.venv/
+env/
+
+# System files
+.DS_Store
+Thumbs.db

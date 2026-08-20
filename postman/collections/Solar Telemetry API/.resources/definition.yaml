@@ -1,0 +1,17 @@
+$kind: collection
+name: Solar Telemetry API
+description: |-
+  Collection for testing the Solar Telemetry REST API.
+
+  This API manages solar panel telemetry data including temperature, irradiance, voltage, current, and maintenance status.
+
+  ## Base URL
+  Set the `baseUrl` variable to your running server (default: http://localhost:8080)
+
+  ## Endpoints
+  - POST /api/telemetry — Save a new telemetry reading
+  - GET /api/telemetry — Retrieve all telemetry records
+  - GET /api/telemetry/maintenance/{status} — Filter records by maintenance status
+variables:
+  baseUrl: http://localhost:8080
+  savedTelemetryId: ""
