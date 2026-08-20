@@ -1,21 +1,93 @@
-# Compiled Class files & Build outputs
+# ========================================
+# Sensitive Credentials & Local Configs
+# ========================================
+src/main/resources/application.properties
+src/main/resources/application.yml
+src/main/resources/application-local.properties
+src/main/resources/application-local.yml
+*.env
+.env
+.env.*
+secrets/
+
+# ========================================
+# Compiled Java & Maven Build Outputs
+# ========================================
 target/
 *.class
+*.jar
+*.war
+*.ear
+*.nar
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+replay_pid*
 
-# IntelliJ IDEA metadata
+# Maven wrapper jar if not tracking binary
+.mvn/wrapper/maven-wrapper.jar
+
+# ========================================
+# IntelliJ IDEA Metadata & Workspaces
+# ========================================
 .idea/
 *.iml
 *.iws
 *.ipr
 out/
+.idea_modules/
+cmake-build-*/
 
-# Python cache & virtual environments
+# ========================================
+# Eclipse & NetBeans
+# ========================================
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+.factorypath
+nbproject/private/
+build/
+nbbuild/
+dist/
+
+# ========================================
+# VS Code & PlatformIO (if added)
+# ========================================
+.vscode/
+.pio/
+.pioenvs/
+.piolibdeps/
+
+# ========================================
+# Python Bytecode & Virtual Environments
+# ========================================
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
 venv/
 .venv/
-env/
+ENV/
+env.bak/
+venv.bak/
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.coverage
+htmlcov/
 
-# System files
+# ========================================
+# OS & System Junk Files
+# ========================================
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
