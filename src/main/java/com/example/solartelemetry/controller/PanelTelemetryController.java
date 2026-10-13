@@ -26,9 +26,21 @@ public class PanelTelemetryController {
         return ResponseEntity.ok(service.getAllTelemetry());
     }
 
+    // ingests telemetry from edge sensors, checks alert thresholds
     @PostMapping
-    public ResponseEntity<PanelTelemetry> create(@RequestBody PanelTelemetry telemetry) {
-        return new ResponseEntity<>(service.saveTelemetry(telemetry), HttpStatus.CREATED);
+    public ResponseEntity<PanelTelemetryService.IngestionResult> create(@RequestBody PanelTelemetry telemetry) {
+        return new ResponseEntity<>(service.processTelemetry(telemetry), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/panel/{panelId}")
+    public ResponseEntity<List<PanelTelemetry>> getPanelHistory(@PathVariable String panelId) {
+        return ResponseEntity.ok(service.getHistory(panelId));
+    }
+
+    // eval electrical health metrics, returns maintenance alerts
+    @GetMapping("/panel/{panelId}/health")
+    public ResponseEntity<PanelTelemetryService.PanelHealthStatus> getPanelHealth(@PathVariable String panelId) {
+        return ResponseEntity.ok(service.evaluateHealth(panelId));
     }
 
     @DeleteMapping("/{id}")

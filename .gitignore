@@ -2,9 +2,6 @@
 # 1. SECURITY & SENSITIVE CREDENTIALS (ZERO TOLERANCE)
 # ====================================================================
 src/main/resources/application.properties
-src/main/resources/application.yml
-src/main/resources/application-*.properties
-src/main/resources/application-*.yml
 *.env
 .env
 .env.*
@@ -41,6 +38,8 @@ hs_err_pid*
 replay_pid*
 .mvn/wrapper/maven-wrapper.jar
 
+
+postman/
 # ====================================================================
 # 3. PYTHON CACHES & VIRTUAL ENVIRONMENTS
 # ====================================================================
@@ -82,19 +81,6 @@ htmlcov/
 .nox/
 .hypothesis/
 
-# ====================================================================
-# 4. EMBEDDED / C / C++ (ARDUINO, ESP32, PLATFORMIO)
-# ====================================================================
-*.o
-*.obj
-*.elf
-*.bin
-*.hex
-*.d
-.pio/
-.pioenvs/
-.piolibdeps/
-cmake-build-*/
 
 # ====================================================================
 # 5. IDEs & WORKSPACES
@@ -107,9 +93,6 @@ cmake-build-*/
 out/
 .idea_modules/
 
-# VS Code
-.vscode/
-*.code-workspace
 
 # Eclipse & NetBeans
 .classpath
